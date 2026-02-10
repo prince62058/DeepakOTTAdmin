@@ -27,6 +27,12 @@ const nextConfig = {
         port: '4555',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.deepent.in',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 }
