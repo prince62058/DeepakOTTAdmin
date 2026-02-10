@@ -2,12 +2,18 @@
 
 import IconifyIcon from '@/components/wrappers/IconifyIcon'
 import { currency } from '@/context/constants'
-import { useDisableSubcriptionMutation, useGetLanguageQuery, useGetSubscriptionQuery, useGetTransactionQuery } from '@/lib/api'
+import {
+  useClearAllTransactionsMutation,
+  useDisableSubcriptionMutation,
+  useGetLanguageQuery,
+  useGetSubscriptionQuery,
+  useGetTransactionQuery,
+} from '@/lib/api'
 import { formateTime } from '@/utils/date'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import { Card, CardFooter, CardHeader, CardTitle, Dropdown, DropdownMenu, DropdownToggle, FormCheck, Spinner } from 'react-bootstrap'
+import { Button, Card, CardFooter, CardHeader, CardTitle, Dropdown, DropdownMenu, DropdownToggle, FormCheck, Modal, Spinner } from 'react-bootstrap'
 import useToggle from '@/hooks/useToggle'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -133,11 +139,29 @@ const TransactionList = () => {
   const [status, setStatus] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [search, setSearch] = useState('')
-  const debounceSearch = useDebounce(search, 500)
+  const debounceSearch = useDebounce(search, 100)
   const { data: transactionData, isLoading } = useGetTransactionQuery({ page: currentPage, search: debounceSearch, Type: status })
   const [isUpdate, setIsUpdate] = useState(false)
   const [currentData, setCurrentData] = useState(null)
   const { isTrue, toggle } = useToggle()
+
+  const [showClearModal, setShowClearModal] = useState(false)
+  const [clearAllTransactions, { isLoading: isClearing }] = useClearAllTransactionsMutation()
+
+  const handleClearAll = async () => {
+    try {
+      const res = await clearAllTransactions().unwrap()
+      if (res?.success) {
+        toast.success(res?.message)
+        setShowClearModal(false)
+      } else {
+        toast.error(res?.message)
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error(error?.data?.message || 'Something went wrong')
+    }
+  }
 
   useEffect(() => {
     setCurrentPage(1)
@@ -151,7 +175,37 @@ const TransactionList = () => {
 
   const renderPagination = () => {
     const pages = []
-    for (let i = 1; i <= transactionData?.pagination?.pages; i++) {
+    const totalPages = transactionData?.pagination?.pages || 1
+    const maxVisiblePages = 7 // Show max 7 page numbers
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
+
+    // Adjust start if we're near the end
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1)
+    }
+
+    // Always show first page
+    if (startPage > 1) {
+      pages.push(
+        <li key={1} className={`page-item ${currentPage === 1 ? 'active' : ''}`}>
+          <button className="page-link" onClick={() => handlePageClick(1)}>
+            1
+          </button>
+        </li>,
+      )
+      if (startPage > 2) {
+        pages.push(
+          <li key="ellipsis-start" className="page-item disabled">
+            <span className="page-link">...</span>
+          </li>,
+        )
+      }
+    }
+
+    // Show page range
+    for (let i = startPage; i <= endPage; i++) {
       pages.push(
         <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
           <button className="page-link" onClick={() => handlePageClick(i)}>
@@ -160,6 +214,25 @@ const TransactionList = () => {
         </li>,
       )
     }
+
+    // Always show last page
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(
+          <li key="ellipsis-end" className="page-item disabled">
+            <span className="page-link">...</span>
+          </li>,
+        )
+      }
+      pages.push(
+        <li key={totalPages} className={`page-item ${currentPage === totalPages ? 'active' : ''}`}>
+          <button className="page-link" onClick={() => handlePageClick(totalPages)}>
+            {totalPages}
+          </button>
+        </li>,
+      )
+    }
+
     return pages
   }
   return (
@@ -174,14 +247,9 @@ const TransactionList = () => {
             <CardTitle as={'h4'} className="flex-grow-1">
               All Transaction List
             </CardTitle>
-            {/* <div
-          className="btn btn-sm btn-primary"
-          onClick={() => {
-            setIsUpdate(false)
-            toggle()
-          }}>
-          Add Subscription
-        </div> */}
+            <div className="btn btn-sm btn-danger ms-2" onClick={() => setShowClearModal(true)}>
+              Clear All
+            </div>
             <form className="app-search d-none d-md-block ms-2">
               <div className="position-relative">
                 <input
@@ -312,6 +380,24 @@ const TransactionList = () => {
             </nav>
           </CardFooter>
           <TransactionUpdateForm isUpdate={isUpdate} isTrue={isTrue} toggle={toggle} currentData={currentData} />
+
+          <Modal show={showClearModal} onHide={() => setShowClearModal(false)} centered>
+            <Modal.Header closeButton>
+              <Modal.Title>Clear All Transactions</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p className="text-danger fw-bold">Are you sure you want to delete ALL transactions?</p>
+              <p>This action cannot be undone. All transaction history will be permanently removed.</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowClearModal(false)}>
+                Cancel
+              </Button>
+              <Button variant="danger" onClick={handleClearAll} disabled={isClearing}>
+                {isClearing ? 'Deleting...' : 'Yes, Delete All'}
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </Card>
       )}
     </>

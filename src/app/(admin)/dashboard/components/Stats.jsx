@@ -6,6 +6,12 @@ import { Card, CardBody, CardFooter, CardTitle, Col, Form, Row } from 'react-boo
 import { useGetDashboardQuery } from '@/lib/api'
 import { useState } from 'react'
 
+// Helper function to format numbers to 2 decimal places
+const formatNumber = (num) => {
+  if (num === null || num === undefined) return '0.00'
+  return Number(num).toFixed(2)
+}
+
 const Stats = () => {
   const today = new Date().toISOString().split('T')[0]
 
@@ -81,6 +87,11 @@ const Stats = () => {
       axisBorder: {
         show: false,
       },
+      labels: {
+        formatter: function (val) {
+          return val.toFixed(2)
+        },
+      },
     },
     grid: {
       show: true,
@@ -131,7 +142,7 @@ const Stats = () => {
         {
           formatter: function (y) {
             if (typeof y !== 'undefined') {
-              return y.toFixed(1)
+              return y.toFixed(2)
             }
             return y
           },
@@ -213,6 +224,11 @@ const Stats = () => {
       axisBorder: {
         show: false,
       },
+      labels: {
+        formatter: function (val) {
+          return val.toFixed(2)
+        },
+      },
     },
     grid: {
       show: true,
@@ -263,7 +279,7 @@ const Stats = () => {
         {
           formatter: function (y) {
             if (typeof y !== 'undefined') {
-              return y.toFixed(1)
+              return y.toFixed(2)
             }
             return y
           },
@@ -271,7 +287,7 @@ const Stats = () => {
         {
           formatter: function (y) {
             if (typeof y !== 'undefined') {
-              return y.toFixed(1)
+              return y.toFixed(2)
             }
             return y
           },
@@ -340,6 +356,11 @@ const Stats = () => {
       axisBorder: {
         show: false,
       },
+      labels: {
+        formatter: function (val) {
+          return val.toFixed(2)
+        },
+      },
     },
     grid: {
       show: true,
@@ -390,7 +411,7 @@ const Stats = () => {
         {
           formatter: function (y) {
             if (typeof y !== 'undefined') {
-              return y.toFixed(1)
+              return y.toFixed(2)
             }
             return y
           },
@@ -628,7 +649,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Revenue</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.revenue?.totalRevenue}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{formatNumber(dashboardData?.data?.revenue?.totalRevenue)}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -645,7 +666,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Payout</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.revenue?.totalPayout}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{formatNumber(dashboardData?.data?.revenue?.totalPayout)}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -732,7 +753,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Min. Watch</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.watchAndEarn?.totalMinutesWatched}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{formatNumber(dashboardData?.data?.watchAndEarn?.totalMinutesWatched)}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -749,7 +770,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Hrs. Watch</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.watchAndEarn?.totalHoursWatched}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{formatNumber(dashboardData?.data?.watchAndEarn?.totalHoursWatched)}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -766,7 +787,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Rewards Paid</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.watchAndEarn?.totalRewardsPaid}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{formatNumber(dashboardData?.data?.watchAndEarn?.totalRewardsPaid)}</h3>
                   </Col>
                 </Row>
               </CardBody>

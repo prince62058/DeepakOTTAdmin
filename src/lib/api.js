@@ -232,6 +232,13 @@ export const api = createApi({
       }),
       invalidatesTags: ['transaction'],
     }),
+    clearAllTransactions: builder.mutation({
+      query: () => ({
+        url: `/admin/clearAllTransactions`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['transaction'],
+    }),
 
     // company
     getCompany: builder.query({
@@ -303,6 +310,7 @@ export const {
   useUpdateCompanyMutation,
   useGetTransactionQuery,
   useUpdateTransactionMutation,
+  useClearAllTransactionsMutation,
   useSendNotificationMutation,
   useUploadImageMutation,
   useUploadMovieMutation,

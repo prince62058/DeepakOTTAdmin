@@ -153,7 +153,34 @@ const UserList = () => {
 
   const renderPagination = () => {
     const pages = []
-    for (let i = 1; i <= userData?.pagination?.pages; i++) {
+    const totalPages = userData?.pagination?.pages || 1
+    const maxVisiblePages = 7
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1)
+    }
+
+    if (startPage > 1) {
+      pages.push(
+        <li key={1} className={`page-item ${currentPage === 1 ? 'active' : ''}`}>
+          <button className="page-link" onClick={() => handlePageClick(1)}>
+            1
+          </button>
+        </li>,
+      )
+      if (startPage > 2) {
+        pages.push(
+          <li key="ellipsis-start" className="page-item disabled">
+            <span className="page-link">...</span>
+          </li>,
+        )
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
       pages.push(
         <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
           <button className="page-link" onClick={() => handlePageClick(i)}>
@@ -162,6 +189,24 @@ const UserList = () => {
         </li>,
       )
     }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(
+          <li key="ellipsis-end" className="page-item disabled">
+            <span className="page-link">...</span>
+          </li>,
+        )
+      }
+      pages.push(
+        <li key={totalPages} className={`page-item ${currentPage === totalPages ? 'active' : ''}`}>
+          <button className="page-link" onClick={() => handlePageClick(totalPages)}>
+            {totalPages}
+          </button>
+        </li>,
+      )
+    }
+
     return pages
   }
 
@@ -262,7 +307,7 @@ const UserList = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {userData?.data?.length > 0 ?
+                  {userData?.data?.length > 0 ? (
                     userData?.data?.map((item, idx) => (
                       <UserCard
                         key={idx}
@@ -274,7 +319,8 @@ const UserList = () => {
                         setCurrentData={setCurrentData}
                         handleStatus={handleStatus}
                       />
-                    )): (
+                    ))
+                  ) : (
                     <tr>
                       <td colSpan={7} className="text-center">
                         No User found.

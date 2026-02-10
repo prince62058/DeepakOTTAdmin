@@ -6,6 +6,7 @@ import Image from 'next/image'
 import NextTopLoader from 'nextjs-toploader'
 import '@/assets/scss/app.scss'
 import { DEFAULT_PAGE_TITLE } from '@/context/constants'
+import DynamicBranding from '@/components/DynamicBranding'
 const play = Play({
   subsets: ['latin'],
   weight: ['400', '700'],
@@ -71,7 +72,10 @@ export default function RootLayout({ children }) {
         <NextTopLoader color="#ff6c2f" showSpinner={false} />
         <div id="__next_splash">
           <AppProvidersWrapper>
-            <ReduxProvider>{children}</ReduxProvider>
+            <ReduxProvider>
+              <DynamicBranding />
+              {children}
+            </ReduxProvider>
           </AppProvidersWrapper>
         </div>
       </body>

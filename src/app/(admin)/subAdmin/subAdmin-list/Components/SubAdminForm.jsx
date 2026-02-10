@@ -94,6 +94,9 @@ const SubAdminForm = ({ currentData, isUpdate, isTrue, toggle }) => {
         const rawData = { userId: currentData?._id }
         for (const key in data) {
           if (data[key] !== null && data[key] !== undefined) {
+            if (key === 'password' && data[key] === '') {
+              continue
+            }
             rawData[key] = data[key]
           }
         }
@@ -207,7 +210,13 @@ const SubAdminForm = ({ currentData, isUpdate, isTrue, toggle }) => {
             <TextFormInput name="email" required type="email" label="Email*" control={control} />
           </Col>
           <Col md={12}>
-            <TextFormInput name="password" required type="text" label="Password*" control={control} />
+            <TextFormInput
+              name="password"
+              required={!isUpdate}
+              type="text"
+              label={isUpdate ? 'Password (Leave blank to keep unchanged)' : 'Password*'}
+              control={control}
+            />
           </Col>
           <Col md={12}>
             <label htmlFor="choices-multiple-remove-button" className="form-label">
