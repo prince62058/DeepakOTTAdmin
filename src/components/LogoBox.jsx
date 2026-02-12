@@ -9,23 +9,24 @@ import { useGetCompanyQuery } from '@/lib/api'
 const LogoBox = () => {
   const { data: companyData } = useGetCompanyQuery()
   const logoUrl = companyData?.data?.icon
+  const favIconUrl = companyData?.data?.favIcon
 
   return (
     <div className="logo-box">
       <Link href="/" className="logo-dark">
-        {/* <Image src={logoSm} width={28} height={26} className="logo-sm" alt="logo sm" /> */}
+        <Image src={favIconUrl || logoUrl || logoDark} width={50} height={50} className="logo-sm" alt="logo sm" style={{ objectFit: 'contain' }} />
         <Image
           src={logoUrl || logoDark}
-          height={24}
-          width={112}
+          height={60}
+          width={180}
           className="logo-lg"
           alt="logo dark"
           style={{ objectFit: 'contain' }} // Ensure logo fits well
         />
       </Link>
       <Link href="/" className="logo-light">
-        {/* <Image src={logoSm} width={28} height={26} className="logo-sm" alt="logo sm" /> */}
-        <Image src={logoUrl || logoLight} height={24} width={112} className="logo-lg" alt="logo light" style={{ objectFit: 'contain' }} />
+        <Image src={favIconUrl || logoUrl || logoLight} width={50} height={50} className="logo-sm" alt="logo sm" style={{ objectFit: 'contain' }} />
+        <Image src={logoUrl || logoLight} height={60} width={180} className="logo-lg" alt="logo light" style={{ objectFit: 'contain' }} />
       </Link>
     </div>
   )

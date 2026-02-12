@@ -59,6 +59,7 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
       subSeries: [],
       maturityInfo: '',
       totalDuration: '',
+      teaserDuration: '',
       genre: [],
       language: [],
       mainType: 'MOVIE',
@@ -128,6 +129,7 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
               releaseDate: currentData?.releaseDate ? new Date(currentData.releaseDate).toISOString().split('T')[0] : '',
               genre: currentData?.genre?.map((g) => g._id) || [],
               language: currentData?.language?.map((l) => l._id) || [],
+              teaserDuration: currentData?.teaserDuration || '',
             },
       )
     } else {
@@ -145,6 +147,7 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
         subSeries: [],
         maturityInfo: '',
         totalDuration: '',
+        teaserDuration: '',
         genre: [],
         language: [],
         mainType: 'MOVIE',
@@ -189,15 +192,15 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
 
     try {
       const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/uploadMovie`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
         onUploadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent
           let percent = Math.floor((loaded * 100) / total)
           console.log(`${loaded}kb of ${total}kb | ${percent}%`)
-          if (percent < 100) {
+          // Cap at 95% to allow for server processing
+          if (percent < 95) {
             setPercent(percent)
+          } else if (percent >= 100) {
+            setPercent(95)
           }
         },
       })
@@ -210,7 +213,8 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
         return ''
       }
     } catch (err) {
-      console.error('Upload error', err)
+      console.error('Upload error details:', err.response?.data || err.message)
+      toast.error(`Upload failed: ${err.response?.data?.message || err.message}`)
       return ''
     }
   }
@@ -250,6 +254,8 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
           teaserUrl,
           poster: posterUrl,
           cast: castWithUploadedImages,
+          teaserDuration: data.teaserDuration,
+          totalDuration: data.totalDuration,
         }
       }
 
@@ -289,7 +295,7 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
               director: data.director,
               writer: data.writer,
               maturityInfo: data.maturityInfo,
-              totalDuration: Number(data.totalDuration),
+              totalDuration: data.totalDuration,
               rating: Number(data.rating),
               imdbRating: Number(data.imdbRating),
             }
@@ -312,7 +318,8 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
           writer: data.writer,
           cast: castWithUploadedImages,
           maturityInfo: data.maturityInfo,
-          totalDuration: Number(data.totalDuration),
+          totalDuration: data.totalDuration,
+          teaserDuration: data.teaserDuration,
           rating: Number(data.rating),
         }
       }
@@ -350,7 +357,9 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
         {percent > 0 && (
           <div className="mb-3">
             <ProgressBar now={percent} label={`${percent}%`} animated striped variant="success" />
-            <p className="text-center mt-1 text-muted">Uploading Media... Please wait.</p>
+            <p className="text-center mt-1 text-muted">
+              {percent >= 95 ? 'Finalizing on server... Please wait.' : 'Uploading Media... Please wait.'}
+            </p>
           </div>
         )}
         <form className="row g-2" onSubmit={handleSubmit(onSubmit)}>
@@ -377,7 +386,7 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
             <TextFormInput name="maturityInfo" required type="text" label="Maturity Info*" control={control} />
           </Col>
           <Col md={6}>
-            <TextFormInput name="totalDuration" required type="number" label="Duration*" control={control} />
+            <TextFormInput name="totalDuration" required type="text" label="Duration*" control={control} />
           </Col>
           {/* Other Info */}
           <Col md={6}>
@@ -554,8 +563,18 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
                       controlsList="nodownload"
                       className="rounded border border-light border-3 shadow-sm"
                       key={field.value instanceof File ? field.value.name + field.value.size : field.value} // Forces re-render
-                    >
-                      <source src={field.value instanceof File ? URL.createObjectURL(field.value) : field.value} type="video/mp4" />
+                      onLoadedMetadata={(e) => {
+                        const duration = e.target.duration
+                        if (duration && !watch('teaserDuration')) {
+                          const hours = Math.floor(duration / 3600)
+                          const minutes = Math.floor((duration % 3600) / 60)
+                          const seconds = Math.floor(duration % 60)
+                          const formatted = hours > 0 ? `${hours}h ${minutes}m ${seconds}s` : `${minutes}m ${seconds}s`
+                          setValue('teaserDuration', formatted)
+                          console.log('Teaser Duration detected:', formatted)
+                        }
+                      }}>
+                      <source src={field.value instanceof File ? URL.createObjectURL(field.value) : field.value} />
                       Your browser does not support the video tag.
                     </video>
                   ) : (
@@ -630,7 +649,18 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
                         controls
                         controlsList="nodownload"
                         className="rounded border border-light border-3 shadow-sm"
-                        key={field.value instanceof File ? field.value.name + field.value.size : field.value}>
+                        key={field.value instanceof File ? field.value.name + field.value.size : field.value}
+                        onLoadedMetadata={(e) => {
+                          const duration = e.target.duration
+                          if (duration && !watch('totalDuration')) {
+                            const hours = Math.floor(duration / 3600)
+                            const minutes = Math.floor((duration % 3600) / 60)
+                            const seconds = Math.floor(duration % 60)
+                            const formatted = hours > 0 ? `${hours}h ${minutes}m ${seconds}s` : `${minutes}m ${seconds}s`
+                            setValue('totalDuration', formatted)
+                            console.log('Movie Duration detected:', formatted)
+                          }
+                        }}>
                         <source src={field.value instanceof File ? URL.createObjectURL(field.value) : field.value} />
                       </video>
                     ) : (
@@ -751,7 +781,9 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
             {percent > 0 && (
               <div className="mb-3 w-100">
                 <ProgressBar now={percent} label={`${percent}%`} animated striped variant="success" />
-                <p className="text-center mt-1 text-muted small">Uploading Media... Do not close this window.</p>
+                <p className="text-center mt-1 text-muted small">
+                  {percent >= 95 ? 'Finalizing on server... Do not close this window.' : 'Uploading Media... Do not close this window.'}
+                </p>
               </div>
             )}
             <div className="d-flex justify-content-end gap-2">

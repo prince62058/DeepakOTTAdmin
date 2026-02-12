@@ -44,10 +44,21 @@ const SubscriptionForm = ({ currentData, isUpdate, isTrue, toggle }) => {
   const [updateSubscription] = useUpdateSubscriptionMutation()
 
   const onSubmit = async (data) => {
+    // 🧹 Clean data: Only send necessary fields
+    const payload = {
+      planName: data.planName,
+      planDescription: data.planDescription,
+      planPrice: Number(data.planPrice),
+      planDuration: Number(data.planDuration),
+      planType: data.planType,
+      planEarningFeature: data.planEarningFeature === 'true' || data.planEarningFeature === true,
+      fullAccess: data.fullAccess === 'true' || data.fullAccess === true,
+    }
+
     if (isUpdate) {
       setLoading(true)
       try {
-        const res = await updateSubscription({ ...data, planId: currentData?._id }).unwrap()
+        const res = await updateSubscription({ ...payload, planId: currentData?._id }).unwrap()
         if (res?.success) {
           toast.success(res?.message, {
             position: 'top-right',
@@ -75,7 +86,7 @@ const SubscriptionForm = ({ currentData, isUpdate, isTrue, toggle }) => {
     } else {
       setLoading(true)
       try {
-        const res = await createSubscription(data).unwrap()
+        const res = await createSubscription(payload).unwrap()
         if (res?.success) {
           toast.success(res?.message, {
             position: 'top-right',
@@ -158,7 +169,7 @@ const SubscriptionForm = ({ currentData, isUpdate, isTrue, toggle }) => {
               />
             </div>
           </Col>
-          <Col md={6}>
+          {/* <Col md={6}>
             <div>
               <FormLabel htmlFor="fullAccess-select">Choose fullAccess</FormLabel>
               <Controller
@@ -172,7 +183,7 @@ const SubscriptionForm = ({ currentData, isUpdate, isTrue, toggle }) => {
                 )}
               />
             </div>
-          </Col>
+          </Col> */}
           <ModalFooter>
             <Button type="button" variant="secondary" onClick={toggle}>
               Close

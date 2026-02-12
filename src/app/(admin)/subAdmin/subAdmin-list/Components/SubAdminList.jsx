@@ -1,4 +1,5 @@
 'use client'
+import CryptoJS from 'crypto-js'
 
 import IconifyIcon from '@/components/wrappers/IconifyIcon'
 import { currency } from '@/context/constants'
@@ -93,6 +94,24 @@ const SubAdminCard = ({ idx, data, setIsUpdate, toggle, setCurrentData, handleSt
         )}
       </td>
 
+      <td>
+        <div className="d-flex flex-column align-items-start gap-0">
+          <div>
+            {(() => {
+              if (data?.subAdminPassword) {
+                try {
+                  const bytes = CryptoJS.AES.decrypt(data.subAdminPassword, 'mySecretKey123')
+                  const decrypted = bytes.toString(CryptoJS.enc.Utf8)
+                  return decrypted || '-'
+                } catch (e) {
+                  return '-'
+                }
+              }
+              return '-'
+            })()}
+          </div>
+        </div>
+      </td>
       <td>
         <FormCheck
           type="switch"
@@ -286,12 +305,13 @@ const SubAdminList = () => {
                       Permissions
                     </th>
 
+                    <th>Password</th>
                     <th>Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {subAdminData?.data?.length > 0 ?
+                  {subAdminData?.data?.length > 0 ? (
                     subAdminData?.data?.map((item, idx) => (
                       <SubAdminCard
                         key={idx}
@@ -303,7 +323,8 @@ const SubAdminList = () => {
                         setCurrentData={setCurrentData}
                         handleStatus={handleStatus}
                       />
-                    )): (
+                    ))
+                  ) : (
                     <tr>
                       <td colSpan={6} className="text-center">
                         No Sub Admin found.

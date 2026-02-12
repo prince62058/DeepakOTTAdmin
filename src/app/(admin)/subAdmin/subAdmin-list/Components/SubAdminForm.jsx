@@ -12,6 +12,7 @@ import {
   useUpdateSubscriptionMutation,
   useUploadImageMutation,
 } from '@/lib/api'
+import CryptoJS from 'crypto-js'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 import { Button, Col, FormLabel, FormSelect, Modal, ModalBody, ModalFooter, ModalHeader } from 'react-bootstrap'
@@ -37,12 +38,21 @@ const SubAdminForm = ({ currentData, isUpdate, isTrue, toggle }) => {
 
   useEffect(() => {
     if (isUpdate && currentData) {
+      let decryptedPassword = ''
+      if (currentData?.subAdminPassword) {
+        try {
+          const bytes = CryptoJS.AES.decrypt(currentData.subAdminPassword, 'mySecretKey123')
+          decryptedPassword = bytes.toString(CryptoJS.enc.Utf8)
+        } catch (err) {
+          console.error('Decryption failed:', err)
+        }
+      }
+
       reset({
         name: currentData?.name,
         image: currentData?.image,
         email: currentData?.email,
-        password: '',
-        // password: currentData?.password,
+        password: decryptedPassword,
         permissions: currentData?.permissions,
       })
     } else {

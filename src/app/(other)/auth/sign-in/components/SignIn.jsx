@@ -8,8 +8,11 @@ import Image from 'next/image'
 import LoginFrom from './LoginFrom'
 import { Card, Col, Row } from 'react-bootstrap'
 import Link from 'next/link'
+import { useGetCompanyQuery } from '@/lib/api'
 
 const SignIn = () => {
+  const { data: companyData } = useGetCompanyQuery()
+  const logoUrl = companyData?.data?.icon
 
   return (
     <div className="d-flex flex-column vh-100 p-3">
@@ -21,10 +24,10 @@ const SignIn = () => {
                 <div className="d-flex flex-column h-100 justify-content-center">
                   <div className="auth-logo mb-4">
                     <Link href="#" className="logo-dark">
-                      <Image src={logoDark} height={24} alt="logo dark" />
+                      <Image src={logoUrl || logoDark} height={60} width={180} style={{ objectFit: 'contain' }} alt="logo dark" />
                     </Link>
                     <Link href="#" className="logo-light">
-                      <Image src={logoLight} height={24} alt="logo light" />
+                      <Image src={logoUrl || logoLight} height={60} width={180} style={{ objectFit: 'contain' }} alt="logo light" />
                     </Link>
                   </div>
                   <h2 className="fw-bold fs-24">Sign In</h2>

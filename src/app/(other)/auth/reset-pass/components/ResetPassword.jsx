@@ -1,26 +1,27 @@
-'use client';
+'use client'
 
-import logoDark from '@/assets/images/logo-dark.png';
-import logoLight from '@/assets/images/logo-light.png';
-import smallImg from '@/assets/images/small/img-10.jpg';
-import TextFormInput from '@/components/form/TextFormInput';
-import { yupResolver } from '@hookform/resolvers/yup';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Button, Card, Col, Row } from 'react-bootstrap';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import logoDark from '@/assets/images/logo-dark.png'
+import logoLight from '@/assets/images/logo-light.png'
+import smallImg from '@/assets/images/small/img-10.jpg'
+import TextFormInput from '@/components/form/TextFormInput'
+import { yupResolver } from '@hookform/resolvers/yup'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Button, Card, Col, Row } from 'react-bootstrap'
+import { useForm } from 'react-hook-form'
+import * as yup from 'yup'
+import { useGetCompanyQuery } from '@/lib/api'
 const ResetPassword = () => {
+  const { data: companyData } = useGetCompanyQuery()
+  const logoUrl = companyData?.data?.icon
   const resetPasswordSchema = yup.object({
-    email: yup.string().email('Please enter a valid email').required('please enter your email')
-  });
-  const {
-    control,
-    handleSubmit
-  } = useForm({
-    resolver: yupResolver(resetPasswordSchema)
-  });
-  return <div className="d-flex flex-column vh-100 p-3">
+    email: yup.string().email('Please enter a valid email').required('please enter your email'),
+  })
+  const { control, handleSubmit } = useForm({
+    resolver: yupResolver(resetPasswordSchema),
+  })
+  return (
+    <div className="d-flex flex-column vh-100 p-3">
       <div className="d-flex flex-column flex-grow-1">
         <Row className="h-100">
           <Col xxl={7}>
@@ -29,10 +30,10 @@ const ResetPassword = () => {
                 <div className="d-flex flex-column h-100 justify-content-center">
                   <div className="auth-logo mb-4">
                     <Link href="/dashboard" className="logo-dark">
-                      <Image src={logoDark} height={24} alt="logo dark" />
+                      <Image src={logoUrl || logoDark} height={60} width={180} style={{ objectFit: 'contain' }} alt="logo dark" />
                     </Link>
                     <Link href="/dashboard" className="logo-light">
-                      <Image src={logoLight} height={24} alt="logo light" />
+                      <Image src={logoUrl || logoLight} height={60} width={180} style={{ objectFit: 'contain' }} alt="logo light" />
                     </Link>
                   </div>
                   <h2 className="fw-bold fs-24">Reset Password</h2>
@@ -41,7 +42,14 @@ const ResetPassword = () => {
                   </p>
                   <div>
                     <form className="authentication-form" onSubmit={handleSubmit(() => {})}>
-                      <TextFormInput control={control} name="email" containerClassName="mb-3" label="Email" id="email-id" placeholder="Enter your email" />
+                      <TextFormInput
+                        control={control}
+                        name="email"
+                        containerClassName="mb-3"
+                        label="Email"
+                        id="email-id"
+                        placeholder="Enter your email"
+                      />
                       <div className="mb-1 text-center d-grid">
                         <Button variant="primary" type="submit">
                           Reset Password
@@ -68,6 +76,7 @@ const ResetPassword = () => {
           </Col>
         </Row>
       </div>
-    </div>;
-};
-export default ResetPassword;
+    </div>
+  )
+}
+export default ResetPassword

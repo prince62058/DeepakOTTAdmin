@@ -56,8 +56,8 @@ const SubscriptionCard = ({ idx, data, setIsUpdate, toggle, setCurrentData, hand
           type="switch"
           id="switch2"
           className="cursor-pointer"
-          checked={data?.disable}
-          onChange={() => handleStatus(data?._id, !data?.disable)}
+          checked={data?.disable == true || data?.disable == 'true'}
+          onChange={() => handleStatus(data?._id, data?.disable == true || data?.disable == 'true' ? false : true)}
         />
       </td>
       <td>
@@ -66,12 +66,12 @@ const SubscriptionCard = ({ idx, data, setIsUpdate, toggle, setCurrentData, hand
           {data?.planEarningFeature ? 'Yes' : 'No'}
         </span>
       </td>
-      <td>
+      {/* <td>
         <span
           className={`badge bg-${data?.fullAccess == 'true' ? 'success-subtle' : 'warning-subtle'}  text-${data?.status == 'true' ? 'success' : 'warning'}  py-1 px-2`}>
           {data?.fullAccess ? 'Yes' : 'No'}
         </span>
-      </td>
+      </td> */}
       <td>
         <div className="d-flex gap-2">
           {/* <Link href="" className="btn btn-light btn-sm">
@@ -289,7 +289,7 @@ const SubscriptionList = () => {
                     <th>Type</th>
                     <th>Status</th>
                     <th>Plan Earning</th>
-                    <th>Full Access</th>
+                    {/* <th>Full Access</th> */}
                     <th>Action</th>
                   </tr>
                 </thead>

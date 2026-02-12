@@ -59,11 +59,11 @@ export default function RootLayout({ children }) {
         <div id="splash-screen">
           <Image
             alt="Logo"
-            width={112}
-            height={24}
+            width={200}
+            height={60}
             src={logoDark}
             style={{
-              height: '7%',
+              height: '15%',
               width: 'auto',
             }}
             priority

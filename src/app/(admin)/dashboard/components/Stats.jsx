@@ -12,6 +12,16 @@ const formatNumber = (num) => {
   return Number(num).toFixed(2)
 }
 
+const NoDataPlaceholder = ({ title }) => (
+  <div
+    className="d-flex flex-column align-items-center justify-content-center py-5 border rounded bg-light bg-opacity-10"
+    style={{ minHeight: '313px' }}>
+    <IconifyIcon icon="solar:chart-2-line-duotone" className="fs-48 text-muted mb-2" />
+    <h5 className="text-muted">No Data Available</h5>
+    <p className="text-muted small mb-0">Try selecting a different date range for {title}</p>
+  </div>
+)
+
 const Stats = () => {
   const today = new Date().toISOString().split('T')[0]
 
@@ -478,7 +488,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">User</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.users?.total}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.users?.total || 0}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -495,7 +505,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Active</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.users?.active}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.users?.active || 0}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -512,7 +522,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">New User</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.users?.newUsers}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.users?.newUsers || 0}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -529,7 +539,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Sub Admin</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.users?.totalSubAdmins}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.users?.totalSubAdmins || 0}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -555,7 +565,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Active Plan</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.subscriptions?.activePlans}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.subscriptions?.activePlans || 0}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -572,7 +582,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Watch And Earn Plan</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.subscriptions?.byType?.WATCH_AND_EARN_PLAN}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.subscriptions?.byType?.WATCH_AND_EARN_PLAN || 0}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -589,7 +599,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Monthly Premium</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.subscriptions?.byType?.MONTHLY_PREMIUM}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.subscriptions?.byType?.MONTHLY_PREMIUM || 0}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -606,7 +616,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Pay Per Movie Plan</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.subscriptions?.byType?.PAY_PER_MOVIE_PLAN}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.subscriptions?.byType?.PAY_PER_MOVIE_PLAN || 0}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -623,7 +633,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Yearly Premium Plan</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.subscriptions?.byType?.YEARLY_PREMIUM_PLAN}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.subscriptions?.byType?.YEARLY_PREMIUM_PLAN || 0}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -683,7 +693,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Transaction</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.revenue?.totalTransactions}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.revenue?.totalTransactions || 0}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -710,7 +720,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Approved</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.transactions?.statusBreakdown?.APPROVED}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.transactions?.statusBreakdown?.APPROVED || 0}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -727,7 +737,7 @@ const Stats = () => {
                   </Col>
                   <Col xs={6} className="text-end">
                     <p className="text-muted mb-0 text-truncate">Pending</p>
-                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.transactions?.statusBreakdown?.PENDING}</h3>
+                    <h3 className="text-dark mt-1 mb-0">{dashboardData?.data?.transactions?.statusBreakdown?.PENDING || 0}</h3>
                   </Col>
                 </Row>
               </CardBody>
@@ -819,8 +829,14 @@ const Stats = () => {
               </div> */}
             </div>
             <div dir="ltr">
-              <div id="dash-performance-chart" className="apex-charts" />
-              <ReactApexChart options={dailyOptions} series={dailyOptions.series} height={313} type="line" className="apex-charts" />
+              {dashboardData?.data?.trends?.daily?.length > 0 ? (
+                <>
+                  <div id="dash-performance-chart" className="apex-charts" />
+                  <ReactApexChart options={dailyOptions} series={dailyOptions.series} height={313} type="line" className="apex-charts" />
+                </>
+              ) : (
+                <NoDataPlaceholder title="Daily Trends" />
+              )}
             </div>
           </CardBody>
         </Card>
@@ -849,8 +865,14 @@ const Stats = () => {
               </div> */}
             </div>
             <div dir="ltr">
-              <div id="dash-performance-chart" className="apex-charts" />
-              <ReactApexChart options={revenueOptions} series={revenueOptions.series} height={313} type="line" className="apex-charts" />
+              {dashboardData?.data?.trends?.revenue?.length > 0 ? (
+                <>
+                  <div id="dash-performance-chart" className="apex-charts" />
+                  <ReactApexChart options={revenueOptions} series={revenueOptions.series} height={313} type="line" className="apex-charts" />
+                </>
+              ) : (
+                <NoDataPlaceholder title="Revenue" />
+              )}
             </div>
           </CardBody>
         </Card>
@@ -879,8 +901,14 @@ const Stats = () => {
               </div>*/}
             </div>
             <div dir="ltr">
-              <div id="dash-performance-chart" className="apex-charts" />
-              <ReactApexChart options={userOptions} series={userOptions.series} height={313} type="line" className="apex-charts" />
+              {dashboardData?.data?.trends?.userGrowth?.length > 0 ? (
+                <>
+                  <div id="dash-performance-chart" className="apex-charts" />
+                  <ReactApexChart options={userOptions} series={userOptions.series} height={313} type="line" className="apex-charts" />
+                </>
+              ) : (
+                <NoDataPlaceholder title="User Growth" />
+              )}
             </div>
           </CardBody>
         </Card>

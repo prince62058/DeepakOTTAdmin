@@ -36,12 +36,20 @@ const TransactionCard = ({ idx, data, setIsUpdate, toggle, setCurrentData, curre
       </td>
       <td>
         <div className="d-flex flex-column align-items-start gap-0">
-          <div>Type :- {data?.bankOrUpiId?.type || '-'}</div>
-          {data?.bankOrUpiId?.fullName && <div>Full Name :- {data?.bankOrUpiId?.fullName || '-'}</div>}
-          {data?.bankOrUpiId?.bankName && <div>Bank Name :- {data?.bankOrUpiId?.bankName || '-'}</div>}
-          {data?.bankOrUpiId?.accountNumber && <div>Acc. No. :- {data?.bankOrUpiId?.accountNumber || '-'}</div>}
-          {data?.bankOrUpiId?.ifscCode && <div>IFSC Code :- {data?.bankOrUpiId?.ifscCode || '-'}</div>}
-          {data?.bankOrUpiId?.upiId && <div>UPI Id :- {data?.bankOrUpiId?.upiId || '-'}</div>}
+          {data?.Type === 'CREDIT' && !data?.bankOrUpiId?.type ? (
+            <div className="fw-bold text-success">Credit in Wallet</div>
+          ) : data?.Type === 'DEBIT' && !data?.bankOrUpiId?.type ? (
+            <div className="fw-bold text-danger">Paid via Razorpay</div>
+          ) : (
+            <>
+              <div>Type :- {data?.bankOrUpiId?.type || '-'}</div>
+              {data?.bankOrUpiId?.fullName && <div>Full Name :- {data?.bankOrUpiId?.fullName || '-'}</div>}
+              {data?.bankOrUpiId?.bankName && <div>Bank Name :- {data?.bankOrUpiId?.bankName || '-'}</div>}
+              {data?.bankOrUpiId?.accountNumber && <div>Acc. No. :- {data?.bankOrUpiId?.accountNumber || '-'}</div>}
+              {data?.bankOrUpiId?.ifscCode && <div>IFSC Code :- {data?.bankOrUpiId?.ifscCode || '-'}</div>}
+              {data?.bankOrUpiId?.upiId && <div>UPI Id :- {data?.bankOrUpiId?.upiId || '-'}</div>}
+            </>
+          )}
         </div>
       </td>
       <td>
