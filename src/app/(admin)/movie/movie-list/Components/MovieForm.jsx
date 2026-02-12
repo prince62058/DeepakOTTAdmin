@@ -186,32 +186,36 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
 
   // Upload handler (video)
   // Upload handler (video)
+  // Upload handler (video) - Direct S3 Upload
   const uploadVideoFileHandler = async (file) => {
-    const formData = new FormData()
-    formData.append('movie', file)
-
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/uploadMovie`, formData, {
+      // 1. Get Presigned URL from Backend
+      const { data: presignedData } = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/getPresignedUrl`, {
+        fileName: file.name,
+        fileType: file.type,
+      })
+
+      if (!presignedData.success) {
+        throw new Error('Failed to get presigned URL')
+      }
+
+      const { url, publicUrl } = presignedData
+
+      // 2. Upload File Directly to S3 (DigitalOcean Spaces)
+      await axios.put(url, file, {
+        headers: {
+          'Content-Type': file.type,
+          'x-amz-acl': 'public-read', // Ensure it's public
+        },
         onUploadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent
           let percent = Math.floor((loaded * 100) / total)
           console.log(`${loaded}kb of ${total}kb | ${percent}%`)
-          // Cap at 95% to allow for server processing
-          if (percent < 95) {
-            setPercent(percent)
-          } else if (percent >= 100) {
-            setPercent(95)
-          }
+          setPercent(percent)
         },
       })
 
-      if (res.data?.success) {
-        setPercent(100)
-        // setTimeout(() => setPercent(0), 1000)
-        return res.data?.url || ''
-      } else {
-        return ''
-      }
+      return publicUrl
     } catch (err) {
       console.error('Upload error details:', err.response?.data || err.message)
       toast.error(`Upload failed: ${err.response?.data?.message || err.message}`)
