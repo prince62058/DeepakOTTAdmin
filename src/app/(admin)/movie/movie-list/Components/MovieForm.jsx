@@ -189,10 +189,17 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
   // Upload handler (video) - Direct S3 Upload
   const uploadVideoFileHandler = async (file) => {
     try {
+      // FIX: Handle .mkv files which might have empty type
+      let fileType = file.type
+      // If type is empty OR generic binary stream, and extension is .mkv, force correct MIME type
+      if ((!fileType || fileType === 'application/octet-stream') && file.name.toLowerCase().endsWith('.mkv')) {
+        fileType = 'video/x-matroska'
+      }
+
       // 1. Get Presigned URL from Backend
       const { data: presignedData } = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/getPresignedUrl`, {
         fileName: file.name,
-        fileType: file.type,
+        fileType: fileType || file.type, // Use corrected type or fallback to original
       })
 
       if (!presignedData.success) {
@@ -204,7 +211,7 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
       // 2. Upload File Directly to S3 (DigitalOcean Spaces)
       await axios.put(url, file, {
         headers: {
-          'Content-Type': file.type,
+          'Content-Type': fileType || file.type,
           'x-amz-acl': 'public-read', // Ensure it's public
         },
         onUploadProgress: (progressEvent) => {
@@ -592,7 +599,7 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
                   <input
                     type="file"
                     ref={teaserRef}
-                    accept="video/*"
+                    accept="video/*, .mkv"
                     hidden
                     onChange={(e) => {
                       const file = e.target.files?.[0]
@@ -678,7 +685,7 @@ const MovieForm = ({ currentData, isUpdate, isTrue, toggle }) => {
                     <input
                       type="file"
                       ref={videoRef}
-                      accept="video/*"
+                      accept="video/*, .mkv"
                       hidden
                       onChange={(e) => {
                         const file = e.target.files?.[0]

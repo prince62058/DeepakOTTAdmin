@@ -97,7 +97,7 @@ const SeasonItem = ({ control, nestIndex, setValue, watch, removeSeason }) => {
                     <input
                       type="file"
                       className="form-control form-control-sm"
-                      accept="video/*"
+                      accept="video/*, .mkv"
                       onChange={(e) => handleFileChange(e, `subSeries.${nestIndex}.Series.${k}.url`)}
                     />
                   </div>
